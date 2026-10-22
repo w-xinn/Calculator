@@ -1,9 +1,14 @@
-import operation
 import history
+import operation
+from history import History
 
 
 def main():
-    calculating = True
+    calculating = True  # 程序进入计算状态
+
+    calc = history.History()
+
+    calc.load_history()  # 加载历史计算记录
 
     while calculating:
         while True:
@@ -15,7 +20,7 @@ def main():
 
         while True:
             operator = input("请选择运算符(+ - * /):").strip()
-            if(operator not in ["+", "-", "*", "/"]):
+            if operator not in ["+", "-", "*", "/"]:
                 print("请选择正确的运算符！")
                 continue
             break
@@ -23,7 +28,7 @@ def main():
         while True:
             try:
                 num_2 = float(input("请输入第二个数：").strip())
-                if (operator == "/" and num_2 == 0):
+                if operator == "/" and num_2 == 0:
                     print("除数不能为0！")
                     continue    
                 break
@@ -32,7 +37,9 @@ def main():
         
         result = operation.calculate(num_1, num_2, operator)
 
-        print(history.add_history(num_1, num_2, operator, result))  # 保存计算记录并打印
+        # 保存计算记录并打印    
+        print(f"{num_1} {operator} {num_2} = {result}")  
+        calc.add_history(num_1, num_2, operator, result)
 
         while True:
             choice = input("是否继续运算？(Y=继续，N=退出，H=历史)")
@@ -42,10 +49,13 @@ def main():
             elif choice.upper() == "Y":
                 break
             elif choice.upper() == "H":
-                history.show_history()
+                calc.show_history()
 
             else:
                 print("请输入有效的选项！")
 
+        calc.save_history()
+
 if __name__ == "__main__":
     main()
+
