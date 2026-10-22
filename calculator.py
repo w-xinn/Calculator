@@ -1,4 +1,6 @@
 isCalculating = True
+history = []  # 记录历史计算结果
+
 while isCalculating:
     while True:
         try:
@@ -33,14 +35,19 @@ while isCalculating:
     elif operator == "/":
         result = num_1 / num_2
     print(f"{num_1} {operator} {num_2} = {result}")
+    history.append(f"{num_1} {operator} {num_2} = {result}")
 
     while True:
-        choice = input("是否继续运算？(Y/N)")
+        choice = input("是否继续运算？(Y=继续，N=退出，H=历史)")
         if choice.upper() == "N":
             isCalculating = False
             break
         elif choice.upper() == "Y":
             break
+        elif choice.upper() == "H":
+            print("===== 计算历史 =====")
+
+            for index, record in enumerate(history, start=1):
+                print(f"{index}: {record}")
         else:
             print("请输入有效的选项！")
-            
