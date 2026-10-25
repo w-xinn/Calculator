@@ -7,11 +7,16 @@ def tokenize(expression):
     number = ""
 
     for char in expression:
-        if char in ["+", "-", "x", "÷", "(", ")"]:
+        if char in ["+", "x", "÷", "(", ")"]:
             if number:
                 tokens.append(number)
                 number = ""
             tokens.append(char)
+        elif char == "-":
+            if not tokens or tokens[-1] in ["+", "x", "÷", "(", ")"]:
+                number += char
+            else:
+                tokens.append(char)
         else:
             number += char
 
@@ -43,7 +48,7 @@ def parse(expression: str) -> float:
 
     for token in expression:
         # token如果是数值，则直接压入output
-        if token.isdigit():
+        if is_number(token):
             output.append(float(token))
         # token如果是运算符
         elif token in ["+", "-", "x", "÷"]:
@@ -86,3 +91,11 @@ def parse(expression: str) -> float:
             solve_stack.append(token)
 
     return solve_stack[0]
+
+def is_number(token):
+    """判断是否为数值"""
+    try:
+        float(token)
+        return True
+    except ValueError:
+        return False
