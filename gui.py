@@ -1,5 +1,6 @@
 import tkinter as tk
 import operation
+import parser
 
 
 def validate_input(value):
@@ -27,16 +28,8 @@ def calculate_result():
     """计算算式结果"""
     expression = display.get()
 
-    for operator in ["+", "-", "x", "÷"]:
-        if operator in expression:
-            num_1, num_2 = expression.split(operator)
-            break
-
-    num_1 = float(num_1)
-    num_2 = float(num_2)
-
     try:
-        result = operation.calculate(num_1, num_2, operator)
+        result = parser.parse(expression)
     except Exception:
         result = "Error"
 
@@ -51,37 +44,38 @@ def delete():
     """退格"""
     display.delete(len(display.get()) - 1, tk.END)
 
-window = tk.Tk()  # 创建窗口
-window.title("计算器")  # 设置窗口标题
-window.iconbitmap("calculator.ico")  # 设置窗口图标
-window.geometry("454x580")  # 设置窗口大小
-window.resizable(False, False)  # 禁止调整窗口大小
+if __name__ == '__main__':
+    window = tk.Tk()  # 创建窗口
+    window.title("计算器")  # 设置窗口标题
+    window.iconbitmap("calculator.ico")  # 设置窗口图标
+    window.geometry("454x580")  # 设置窗口大小
+    window.resizable(False, False)  # 禁止调整窗口大小
 
-display_frame = tk.Frame(window)  # 数据展示区
-display_frame.pack(fill="x", padx=10, pady=10)  # 沿 x 轴填充，左右各留 10 像素
+    display_frame = tk.Frame(window)  # 数据展示区
+    display_frame.pack(fill="x", padx=10, pady=10)  # 沿 x 轴填充，左右各留 10 像素
 
-button_frame = tk.Frame(window)  # 按钮区
-button_frame.pack()
+    button_frame = tk.Frame(window)  # 按钮区
+    button_frame.pack()
 
-validate_command = window.register(validate_input)
+    validate_command = window.register(validate_input)
 
-display = (tk.Entry(display_frame,
-         font=("Arial", 50),
-         justify="right",
-         validate="key",
-         validatecommand=(validate_command, "%P")))
-display.pack(fill="x", padx=10, pady=10)
+    display = (tk.Entry(display_frame,
+             font=("Arial", 50),
+             justify="right",
+             validate="key",
+             validatecommand=(validate_command, "%P")))
+    display.pack(fill="x", padx=10, pady=10)
 
-buttons = [
-    ["(", ")", "C", "⌫"],
-    ["7", "8", "9", "÷"],
-    ["4", "5", "6", "x"],
-    ["1", "2", "3", "-"],
-    ["0", ".", "=", "+"]
-]
+    buttons = [
+        ["(", ")", "C", "⌫"],
+        ["7", "8", "9", "÷"],
+        ["4", "5", "6", "x"],
+        ["1", "2", "3", "-"],
+        ["0", ".", "=", "+"]
+    ]
 
-for row, button_row in enumerate(buttons):
-    for column, text in enumerate(button_row):
-        create_buttons(button_frame, text, row, column)
+    for row, button_row in enumerate(buttons):
+        for column, text in enumerate(button_row):
+            create_buttons(button_frame, text, row, column)
 
-window.mainloop()
+    window.mainloop()
