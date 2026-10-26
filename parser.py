@@ -7,13 +7,14 @@ def tokenize(expression):
     number = ""
 
     for char in expression:
-        if char in ["+", "x", "÷", "(", ")"]:
+        char = char.strip()
+        if char in ["+", "×", "÷", "(", ")"]:
             if number:
                 tokens.append(number)
                 number = ""
             tokens.append(char)
         elif char == "-":
-            if not tokens or tokens[-1] in ["+", "x", "÷", "(", ")"]:
+            if not tokens or tokens[-1] in ["+", "×", "÷", "(", ")"]:
                 number += char
             else:
                 tokens.append(char)
@@ -30,8 +31,11 @@ def tokenize(expression):
 # https://www.youtube.com/watch?v=unh6aK8WMwM&t=488s
 # 观看时间：2026-10-24
 # 用于实现本项目的表达式解析器
-def parse(expression: str) -> float:
+def parse(expression: str) -> float | str:
     """将算式解析成后缀表达式，并计算后缀表达式的结果"""
+    if len(expression) == 0:
+        return ""
+
     holding_stack = []
     output = []
     solve_stack = []
@@ -40,18 +44,21 @@ def parse(expression: str) -> float:
     priority = {
         "+": 1,
         "-": 1,
-        "x": 2,
+        "×": 2,
         "÷": 2,
     }
 
-    expression = tokenize(expression)
+    tokens = tokenize(expression)
 
-    for token in expression:
+    if not validate(tokens):
+        return "Error"
+
+    for token in tokens:
         # token如果是数值，则直接压入output
         if is_number(token):
             output.append(float(token))
         # token如果是运算符
-        elif token in ["+", "-", "x", "÷"]:
+        elif token in ["+", "-", "×", "÷"]:
             # holding_stack栈内有元素
             while holding_stack:
                 # 如果栈顶是 ( ，不比较，当前运算符直接压入holding_stack
@@ -82,7 +89,7 @@ def parse(expression: str) -> float:
         output.append(holding_stack.pop())
 
     for token in output:
-        if token in ["+", "-", "x", "÷"]:
+        if token in ["+", "-", "×", "÷"]:
             num_2 = solve_stack.pop()
             num_1 = solve_stack.pop()
             result = operation.calculate(num_1, num_2, token)
@@ -99,3 +106,52 @@ def is_number(token):
         return True
     except ValueError:
         return False
+
+def validate(tokens: list) -> bool:
+    """检查表达式是否合法"""
+    left_parenthesis_count = 0
+    right_parenthesis_count = 0
+
+    if len(tokens) == 1 and tokens[0] in ["+", "-", "×", "÷", ")"]:
+        return False
+
+    for i in range(len(tokens)):
+        # 第一个位置
+        if i == 0:
+            # token 只能是数字或者(
+            if not (is_number(tokens[i]) or tokens[i] == "("):
+                return False
+            elif tokens[i] == "(":
+                left_parenthesis_count += 1
+                if not (is_number(tokens[i + 1]) or tokens[i + 1] == "("):
+                    return False
+        # 最后一个位置
+        elif i == len(tokens) - 1:
+            # token 只能是数字或者 )
+            if not (is_number(tokens[i]) or tokens[i] == ")"):
+                return False
+            elif tokens[i] == ")":
+                right_parenthesis_count += 1
+        # 其他位置
+        else:
+            if is_number(tokens[i]):
+                if tokens[i + 1] not in ["+", "-", "×", "÷", ")"]:
+                    return False
+            elif tokens[i] in ["+", "-", "×", "÷"]:
+                if not (is_number(tokens[i + 1]) or tokens[i + 1] == "("):
+                    return False
+            elif tokens[i] == "(":
+                left_parenthesis_count += 1
+                if not (is_number(tokens[i + 1]) or tokens[i + 1] == "("):
+                    return False
+            elif tokens[i] == ")":
+                right_parenthesis_count += 1
+                if right_parenthesis_count > left_parenthesis_count:
+                    return False
+                elif tokens[i + 1] not in ["+", "-", "×", "÷", ")"]:
+                    return False
+
+    if right_parenthesis_count != left_parenthesis_count:
+        return False
+
+    return True

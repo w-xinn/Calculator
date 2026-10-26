@@ -5,7 +5,7 @@ import parser
 
 def validate_input(value):
     """检查输入的字符是否合规"""
-    allowed = "0123456789+-x÷.()"
+    allowed = "0123456789+-×÷.()"
     return all(char in allowed for char in value)
 
 def create_buttons(parent, text, row, column):
@@ -28,10 +28,7 @@ def calculate_result():
     """计算算式结果"""
     expression = display.get()
 
-    try:
-        result = parser.parse(expression)
-    except Exception:
-        result = "Error"
+    result = parser.parse(expression)
 
     display.delete(0, tk.END)
     display.insert(tk.END, result)
@@ -69,7 +66,7 @@ if __name__ == '__main__':
     buttons = [
         ["(", ")", "C", "⌫"],
         ["7", "8", "9", "÷"],
-        ["4", "5", "6", "x"],
+        ["4", "5", "6", "×"],
         ["1", "2", "3", "-"],
         ["0", ".", "=", "+"]
     ]
